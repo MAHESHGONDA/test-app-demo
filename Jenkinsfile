@@ -7,7 +7,7 @@ pipeline {
 stage("Docker build") {
      steps {
       
-          sh "docker build -t nikhilnidhi/calculator_1 ."
+          sh "docker build -t saartha/re_temp_r1 ."
      }
 }
 stage("Docker push") {
