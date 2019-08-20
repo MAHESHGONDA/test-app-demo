@@ -1,0 +1,27 @@
+server:
+  port: 20000
+app:
+  open:
+    msg: This is the Trigger Rules Engine Micro Service
+zeromq:
+  port: 5563
+  host: tcp://edgex-core-data
+  addressport: tcp://*:25566
+
+coredataAddressPort: http://edgex-core-data:48080
+commandAddressPort: http://edgex-core-command:48082
+
+#-----------------------Logging types-------------------------------
+logging:
+  remote:
+    enable: true
+    url: http://edgex-support-logging:48061/api/v1/logs
+  level.org.springframework: ERROR
+  level.org.apache: ERROR
+  level.org.edgexfoundry: INFO
+  file: /saarthaiot/logs/trigger-rulesengine.log
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-path: /api/v1/ping
