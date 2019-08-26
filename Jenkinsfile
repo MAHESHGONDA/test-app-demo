@@ -5,13 +5,13 @@ pipeline {
 
           stage("Docker build") {
                steps {
-                    sh "sudo docker build -t saartha/re_temp_r1 ."
+                    sh "docker build -t saartha/re_temp_r1 ."
                }
           }
           stage("Docker push") {
                steps {
-                    sh "sudo docker login -u username -p password"
-                    sh "sudo docker push nikhilnidhi/calculator_1"
+                    sh "docker login -u username -p password"
+                    sh "docker push nikhilnidhi/calculator_1"
                }
           }
           stage("Deploy to staging") {
