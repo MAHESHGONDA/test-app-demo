@@ -249,4 +249,4 @@ services:
 
 networks:
   edgex-network:
-    driver: "bridge"
+    driver: "overlay"
