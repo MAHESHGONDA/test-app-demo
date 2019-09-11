@@ -1,0 +1,22 @@
+version: "3"
+services:
+  motion_pir:
+    image: codeserver.saartha.net:8045/saartha/motion_pir
+    ports:
+      - "6860:6860"
+    container_name: motion_pir
+    hostname: motion_pir
+    privileged: true
+    environment:
+      - CONSUL_HOSTNAME=edgex-core-consul
+      - CONSUL_PORT=8500
+      - CONFIG_KEY=motion_pir
+      # <<: *common-variables
+    networks:
+      - edgex-network
+    depends_on:
+      - data
+
+networks:
+  edgex-network:
+    driver: "bridge"
