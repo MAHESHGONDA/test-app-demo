@@ -3,7 +3,7 @@ services:
   motion_pir:
     image: codeserver.saartha.net:8045/saartha/motion_pir
     ports:
-      - "6860:6860"
+      - "6867:6860"
     container_name: motion_pir
     hostname: motion_pir
     privileged: true
