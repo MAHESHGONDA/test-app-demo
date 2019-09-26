@@ -1,0 +1,47 @@
+# Copyright 2017 Dell Inc. All rights reserved.
+name: "temperature"
+manufacturer: "Adafruit"
+model: "temperature_dht22"
+labels: 
+    - "temperature sensor"
+description: "tempreture monitor profile"
+coreCommands: 
+  - 
+    name: all
+    get: 
+        path: "/api/v1/devices/{deviceId}/all"
+        responses:
+          - 
+            code: "200"
+            description: "Get the tempreture value"
+            expectedValues: ["temperature", "humidity"]
+          -
+            code: "503"
+            description: "service unavailable"
+            expectedValues: ["error"]
+  - 
+    name: temperature
+    get: 
+        path: "/api/v1/devices/{deviceId}/temperature"
+        responses:
+          - 
+            code: "200"
+            description: "temperature of the device"
+            expectedValues: ["temperature"]
+          -
+            code: "503"
+            description: "service unavailable"
+            expectedValues: ["error"]
+  -
+    name: humidity
+    get:
+        path: "/api/v1/devices/{deviceId}/humidity"
+        responses:
+          -
+            code: "200"
+            description: "humidity of the Devices"
+            expectedValues: ["humidity"]
+          -
+            code: "503"
+            description: "service unavailable"
+            expectedValues: ["error"]
