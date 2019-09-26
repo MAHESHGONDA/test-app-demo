@@ -23,6 +23,9 @@ volumes:
   consul-config:
   consul-data:
   portainer_data:
+  mosquitto-conf:
+  mosquitto-data:
+  mosquitto-log:
 
 services:
   volume:
@@ -39,7 +42,7 @@ services:
       - consul-data:/consul/data
 
   consul:
-    image: consul:1.3.1
+    image: consul:1.4.5
     ports:
       - "8400:8400"
       - "8500:8500"
@@ -76,7 +79,7 @@ services:
       - consul
 
   mongo:
-    image: edgexfoundry/docker-edgex-mongo-arm64:1.0.0
+    image: edgexfoundry/docker-edgex-mongo-arm64:1.0.1
     ports:
       - "27017:27017"
     container_name: edgex-mongo
@@ -94,7 +97,7 @@ services:
       - volume
 
   logging:
-    image: edgexfoundry/docker-support-logging-go-arm64:1.0.0
+    image: edgexfoundry/docker-support-logging-go-arm64:1.0.1
     ports:
       - "48061:48061"
     container_name: edgex-support-logging
@@ -114,7 +117,7 @@ services:
       - volume
 
   metadata:
-    image: edgexfoundry/docker-core-metadata-go-arm64:1.0.0
+    image: edgexfoundry/docker-core-metadata-go-arm64:1.0.1
     ports:
       - "48081:48081"
     container_name: edgex-core-metadata
@@ -132,7 +135,7 @@ services:
       - logging
 
   data:
-    image: edgexfoundry/docker-core-data-go-arm64:1.0.0
+    image: edgexfoundry/docker-core-data-go-arm64:1.0.1
     ports:
       - "48080:48080"
       - "5563:5563"
@@ -151,7 +154,7 @@ services:
       - logging
 
   command:
-    image: edgexfoundry/docker-core-command-go-arm64:1.0.0
+    image: edgexfoundry/docker-core-command-go-arm64:1.0.1
     ports:
       - "48082:48082"
     container_name: edgex-core-command
@@ -169,7 +172,7 @@ services:
       - metadata
 
   scheduler:
-    image: edgexfoundry/docker-support-scheduler-go-arm64:1.0.0
+    image: edgexfoundry/docker-support-scheduler-go-arm64:1.0.1
     ports:
       - "48085:48085"
     container_name: edgex-support-scheduler
@@ -187,7 +190,7 @@ services:
       - metadata
 
   export-client:
-    image: edgexfoundry/docker-export-client-go-arm64:1.0.0
+    image: edgexfoundry/docker-export-client-go-arm64:1.0.1
     ports:
       - "48071:48071"
     container_name: edgex-export-client
@@ -205,7 +208,7 @@ services:
       - data
 
   export-distro:
-    image: edgexfoundry/docker-export-distro-go-arm64:1.0.0
+    image: edgexfoundry/docker-export-distro-go-arm64:1.0.1
     ports:
       - "48070:48070"
       - "5566:5566"
@@ -230,8 +233,48 @@ services:
       - EXPORT_DISTRO_MQTTS_KEY_FILE=none
 
   #################################################################
-  # abcd - device services
+  #  - device services
   #################################################################
+
+  mosquitto:
+    image: eclipse-mosquitto:1.6.4
+    hostname: mosquitto
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+      - "20003:9001"
+    volumes:
+      - mosquitto-conf:/mosquitto/config
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+    networks:
+      edgex-network:
+        aliases:
+            - mosquitto
+
+  saar-data-export:
+    image: codeserver.saartha.net:8045/saartha/saar-data-export
+    ports:
+      - "20001:20001"
+      - "20002:20002"
+    container_name: saartha-data-import-export
+    hostname: saartha-data-import-export
+    networks:
+      edgex-network:
+        aliases:
+            - saartha-data-import-export
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - data
+      - export-distro
+      - mosquitto
+    environment:
+      - SAAR-DATA-EXPORT_MQTTS_CERT_FILE=none
+      - SAAR-DATA-EXPORT_MQTTS_KEY_FILE=none
   #################################################################
   # Tooling
   #################################################################
