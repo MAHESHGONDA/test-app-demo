@@ -1,0 +1,33 @@
+# Copyright 2017 Dell Inc. All rights reserved.
+name: "motion"
+manufacturer: "gpiozero"
+model: "motion_pir"
+labels:
+  - "motion sensor"
+description: "motion monitor profile"
+coreCommands:
+  - 
+    name: is_motion_detected
+    get:
+        path: "/api/v1/devices/{deviceId}/is_motion_detected"
+        responses:
+        - 
+          code: "200"
+          description: "Get the motion value"
+          expectedValues: ["is_motion_detected"]
+        - 
+          code: "503"
+          description: "service unavailable"
+          expectedValues: ["readerror"]
+    put:
+        path: "/api/v1/devices/{deviceId}/is_motion_detected"
+        parameterNames: ["is_motion_detected"]
+        responses:
+            - 
+                code: "204"
+                description: "Set the motion value."
+                expectedValues: []
+            - 
+                code: "503"
+                description: "service unavailable"
+                expectedValues: ["readerror"]
