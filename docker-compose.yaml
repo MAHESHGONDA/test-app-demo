@@ -293,3 +293,4 @@ services:
 networks:
   edgex-network:
     driver: "overlay"
+    attachable: true
