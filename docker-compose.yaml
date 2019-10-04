@@ -290,9 +290,9 @@ services:
     depends_on:
       - volume
 
-#networks:
-#  edgex-network:
-#    external: {name: portainer_agent_network}
 networks:
   edgex-network:
-    driver: "overlay"
+    external: {name: portainer_agent_network}
+#networks:
+#  edgex-network:
+#    driver: "overlay"
