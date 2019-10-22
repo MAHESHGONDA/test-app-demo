@@ -62,7 +62,7 @@ services:
       - volume
 
   config-seed:
-    image: edgexfoundry/docker-core-config-seed-go-arm64:1.0.0
+    image: codeserver.saartha.net:8045/edgexfoundry/docker-core-config-seed-go-custom
     container_name: edgex-config-seed
     hostname: edgex-core-config-seed
     networks:
@@ -208,7 +208,7 @@ services:
       - data
 
   export-distro:
-    image: edgexfoundry/docker-export-distro-go-arm64:1.0.1
+    image: codeserver.saartha.net:8045/edgexfoundry/docker-export-distro-go-custom
     ports:
       - "48070:48070"
       - "5566:5566"
