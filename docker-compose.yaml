@@ -208,7 +208,7 @@ services:
       - data
 
   export-distro:
-    image: codeserver.saartha.net:8045/edgexfoundry/docker-export-distro-go-custom
+    image: edgexfoundry/docker-export-distro-go-arm64:1.0.1
     ports:
       - "48070:48070"
       - "5566:5566"
