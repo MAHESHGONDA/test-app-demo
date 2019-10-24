@@ -48,7 +48,7 @@ services:
       - volume
 
   config-seed:
-    image: edgexfoundry/docker-core-config-seed-go-arm64:1.0.0
+    image: codeserver.saartha.net:8045/test/config-seed-go
     labels:
       - "com.ess.service.name=edgex-config-seed"
     container_name: edgex-config-seed
