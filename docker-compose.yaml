@@ -1,21 +1,3 @@
-# /*******************************************************************************
-#  * Copyright 2018 Dell Inc.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
-#  * in compliance with the License. You may obtain a copy of the License at
-#  *
-#  * http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software distributed under the License
-#  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-#  * or implied. See the License for the specific language governing permissions and limitations under
-#  * the License.
-#  *
-#  * @author: Jim White, Dell
-#  * EdgeX Foundry, Edinburgh, version 1.0.1
-#  * added: July 26, 2019
-#  *******************************************************************************/
-
 version: "3"
 volumes:
   db-data:
@@ -30,6 +12,8 @@ volumes:
 services:
   volume:
     image: edgexfoundry/docker-edgex-volume-arm64:1.0.0
+    labels: 
+      - "com.ess.service.name=edgex-files"
     container_name: edgex-files
     networks:
       edgex-network:
@@ -43,6 +27,8 @@ services:
 
   consul:
     image: consul:1.4.5
+    labels:
+      - "com.ess.service.name=edgex-consul"
     ports:
       - "8400:8400"
       - "8500:8500"
@@ -63,6 +49,8 @@ services:
 
   config-seed:
     image: edgexfoundry/docker-core-config-seed-go-arm64:1.0.0
+    labels:
+      - "com.ess.service.name=edgex-config-seed"
     container_name: edgex-config-seed
     hostname: edgex-core-config-seed
     networks:
@@ -80,6 +68,8 @@ services:
 
   mongo:
     image: edgexfoundry/docker-edgex-mongo-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-mongo"
     ports:
       - "27017:27017"
     container_name: edgex-mongo
@@ -98,6 +88,8 @@ services:
 
   logging:
     image: edgexfoundry/docker-support-logging-go-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-support-logging"
     ports:
       - "48061:48061"
     container_name: edgex-support-logging
@@ -118,6 +110,8 @@ services:
 
   metadata:
     image: edgexfoundry/docker-core-metadata-go-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-core-metadata"
     ports:
       - "48081:48081"
     container_name: edgex-core-metadata
@@ -136,6 +130,8 @@ services:
 
   data:
     image: edgexfoundry/docker-core-data-go-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-core-data"
     ports:
       - "48080:48080"
       - "5563:5563"
@@ -155,6 +151,8 @@ services:
 
   command:
     image: edgexfoundry/docker-core-command-go-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-core-command"
     ports:
       - "48082:48082"
     container_name: edgex-core-command
@@ -173,6 +171,8 @@ services:
 
   scheduler:
     image: edgexfoundry/docker-support-scheduler-go-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-support-scheduler"
     ports:
       - "48085:48085"
     container_name: edgex-support-scheduler
@@ -191,6 +191,8 @@ services:
 
   export-client:
     image: edgexfoundry/docker-export-client-go-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-export-client"
     ports:
       - "48071:48071"
     container_name: edgex-export-client
@@ -209,6 +211,8 @@ services:
 
   export-distro:
     image: edgexfoundry/docker-export-distro-go-arm64:1.0.1
+    labels:
+      - "com.ess.service.name=edgex-export-distro"
     ports:
       - "48070:48070"
       - "5566:5566"
@@ -238,6 +242,8 @@ services:
 
   mosquitto:
     image: eclipse-mosquitto:1.6.4
+    labels:
+      - "com.ess.service.name=mosquitto"
     hostname: mosquitto
     container_name: mosquitto
     ports:
@@ -254,6 +260,8 @@ services:
 
   saar-data-export:
     image: codeserver.saartha.net:8045/saartha/saar-data-export
+    labels:
+      - "com.ess.service.name=saartha-data-import-export"
     ports:
       - "20001:20001"
       - "20002:20002"
@@ -279,16 +287,18 @@ services:
   # Tooling
   #################################################################
 
-  portainer:
-    image: portainer/portainer
-    ports:
-      - "9000:9000"
-    command: -H unix:///var/run/docker.sock
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    depends_on:
-      - volume
+#  portainer:
+#    image: portainer/portainer
+#    labels:
+#      - "com.ess.service.name=portainer"
+#    ports:
+#      - "9000:9000"
+#    command: -H unix:///var/run/docker.sock
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - portainer_data:/data
+#    depends_on:
+#      - volume
 
 networks:
   edgex-network:
