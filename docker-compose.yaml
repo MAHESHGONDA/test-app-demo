@@ -48,7 +48,7 @@ services:
       - volume
 
   config-seed:
-    image: codeserver.saartha.net:8045/test/config-seed-go
+    image: codeserver.saartha.net:8045/edgexfoundry/config-seed-go
     labels:
       - "com.ess.service.name=edgex-config-seed"
     container_name: edgex-config-seed
