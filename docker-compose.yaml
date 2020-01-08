@@ -257,7 +257,22 @@ services:
       edgex-network:
         aliases:
             - mosquitto
-
+  saar-data-management:
+    image: codeserver.saartha.net:8045/saartha/saar-data-management
+    ports:
+      - "20003:20003"
+    container_name: saar-data-management
+    hostname: saar-data-management
+    networks:
+      edgex-network:
+        aliases:
+            - saar-data-management
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+      
   saar-data-export:
     image: codeserver.saartha.net:8045/saartha/saar-data-export
     labels:
