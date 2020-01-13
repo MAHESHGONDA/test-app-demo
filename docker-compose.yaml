@@ -1,3 +1,21 @@
+# /*******************************************************************************
+#  * Copyright 2018 Dell Inc.
+#  *
+#  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+#  * in compliance with the License. You may obtain a copy of the License at
+#  *
+#  * http://www.apache.org/licenses/LICENSE-2.0
+#  *
+#  * Unless required by applicable law or agreed to in writing, software distributed under the License
+#  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+#  * or implied. See the License for the specific language governing permissions and limitations under
+#  * the License.
+#  *
+#  * @author: Jim White, Dell
+#  * EdgeX Foundry, Edinburgh, version 1.0.1
+#  * added: July 26, 2019
+#  *******************************************************************************/
+
 version: "3"
 volumes:
   db-data:
@@ -24,9 +42,10 @@ services:
       - log-data:/edgex/logs
       - consul-config:/consul/config
       - consul-data:/consul/data
+
   consul:
     image: consul:1.4.5
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "8400:8400"
@@ -45,9 +64,10 @@ services:
       - consul-data:/consul/data
     depends_on:
       - volume
+
   config-seed:
-    image: codeserver.saartha.net:8045/edgexfoundry/config-seed-go
-    labels:
+    image: edgexfoundry/docker-core-config-seed-go-arm64:1.0.0
+    labels: 
       - "com.edgex.hide=yes"
     container_name: edgex-config-seed
     hostname: edgex-core-config-seed
@@ -63,9 +83,10 @@ services:
     depends_on:
       - volume
       - consul
+
   mongo:
     image: edgexfoundry/docker-edgex-mongo-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "27017:27017"
@@ -82,9 +103,10 @@ services:
       - consul-data:/consul/data
     depends_on:
       - volume
+
   logging:
     image: edgexfoundry/docker-support-logging-go-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "48061:48061"
@@ -103,9 +125,10 @@ services:
       - config-seed
       - mongo
       - volume
+
   metadata:
     image: edgexfoundry/docker-core-metadata-go-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "48081:48081"
@@ -122,9 +145,10 @@ services:
       - consul-data:/consul/data
     depends_on:
       - logging
+
   data:
     image: edgexfoundry/docker-core-data-go-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "48080:48080"
@@ -142,9 +166,10 @@ services:
       - consul-data:/consul/data
     depends_on:
       - logging
+
   command:
     image: edgexfoundry/docker-core-command-go-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "48082:48082"
@@ -161,9 +186,10 @@ services:
       - consul-data:/consul/data
     depends_on:
       - metadata
+
   scheduler:
     image: edgexfoundry/docker-support-scheduler-go-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "48085:48085"
@@ -180,9 +206,10 @@ services:
       - consul-data:/consul/data
     depends_on:
       - metadata
+
   export-client:
     image: edgexfoundry/docker-export-client-go-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "48071:48071"
@@ -199,9 +226,10 @@ services:
       - consul-data:/consul/data
     depends_on:
       - data
+
   export-distro:
     image: edgexfoundry/docker-export-distro-go-arm64:1.0.1
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "48070:48070"
@@ -225,9 +253,14 @@ services:
       - EXPORT_DISTRO_CONSUL_HOST=edgex-config-seed
       - EXPORT_DISTRO_MQTTS_CERT_FILE=none
       - EXPORT_DISTRO_MQTTS_KEY_FILE=none
+
+  #################################################################
+  #  - device services
+  #################################################################
+
   mosquitto:
     image: eclipse-mosquitto:1.6.4
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     hostname: mosquitto
     container_name: mosquitto
@@ -242,24 +275,10 @@ services:
       edgex-network:
         aliases:
             - mosquitto
-  saar-data-management:
-    image: codeserver.saartha.net:8045/saartha/saar-data-management
-    ports:
-      - "20003:20003"
-    container_name: saar-data-management
-    hostname: saar-data-management
-    networks:
-      edgex-network:
-        aliases:
-            - saar-data-management
-    volumes:
-      - db-data:/data/db
-      - log-data:/edgex/logs
-      - consul-config:/consul/config
-      - consul-data:/consul/data
+
   saar-data-export:
     image: codeserver.saartha.net:8045/saartha/saar-data-export
-    labels:
+    labels: 
       - "com.edgex.hide=yes"
     ports:
       - "20001:20001"
@@ -282,6 +301,26 @@ services:
     environment:
       - SAAR-DATA-EXPORT_MQTTS_CERT_FILE=none
       - SAAR-DATA-EXPORT_MQTTS_KEY_FILE=none
+  #################################################################
+  # Tooling
+  #################################################################
+
+  portainer:
+    image: portainer/portainer
+    labels: 
+      - "com.edgex.hide=yes"
+    ports:
+      - "9000:9000"
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    depends_on:
+      - volume
+
 networks:
   edgex-network:
     external: {name: portainer_agent_network}
+#networks:
+#  edgex-network:
+#    driver: "overlay"
