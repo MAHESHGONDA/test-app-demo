@@ -1,259 +1,287 @@
-version: '3'
+version: "3"
 volumes:
-    db-data: null
-    log-data: null
-    consul-config: null
-    consul-data: null
-    portainer_data: null
-    mosquitto-conf: null
-    mosquitto-data: null
-    mosquitto-log: null
+  db-data:
+  log-data:
+  consul-config:
+  consul-data:
+  portainer_data:
+  mosquitto-conf:
+  mosquitto-data:
+  mosquitto-log:
+
 services:
-    volume:
-        image: 'edgexfoundry/docker-edgex-volume-arm64:1.0.0'
-        labels:
-            - com.edgex.hide=yes
-        container_name: edgex-files
-        networks:
-            edgex-network: {aliases: [edgex-files]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-    consul:
-        image: 'consul:1.4.5'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '8400:8400'
-            - '8500:8500'
-            - '8600:8600'
-        container_name: edgex-core-consul
-        hostname: edgex-core-consul
-        networks:
-            edgex-network: {aliases: [edgex-core-consul]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - volume
-    config-seed:
-        image: 'codeserver.saartha.net:8045/edgexfoundry/config-seed-go'
-        labels:
-            - com.edgex.hide=yes
-        container_name: edgex-config-seed
-        hostname: edgex-core-config-seed
-        networks:
-            edgex-network: {aliases: [edgex-core-config-seed]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - volume
-            - consul
-    mongo:
-        image: 'edgexfoundry/docker-edgex-mongo-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '27017:27017'
-        container_name: edgex-mongo
-        hostname: edgex-mongo
-        networks:
-            edgex-network: {aliases: [edgex-mongo]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - volume
-    logging:
-        image: 'edgexfoundry/docker-support-logging-go-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '48061:48061'
-        container_name: edgex-support-logging
-        hostname: edgex-support-logging
-        networks:
-            edgex-network: {aliases: [edgex-support-logging]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - config-seed
-            - mongo
-            - volume
-    metadata:
-        image: 'edgexfoundry/docker-core-metadata-go-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '48081:48081'
-        container_name: edgex-core-metadata
-        hostname: edgex-core-metadata
-        networks:
-            edgex-network: {aliases: [edgex-core-metadata]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - logging
-    data:
-        image: 'edgexfoundry/docker-core-data-go-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '48080:48080'
-            - '5563:5563'
-        container_name: edgex-core-data
-        hostname: edgex-core-data
-        networks:
-            edgex-network: {aliases: [edgex-core-data]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - logging
-    command:
-        image: 'edgexfoundry/docker-core-command-go-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '48082:48082'
-        container_name: edgex-core-command
-        hostname: edgex-core-command
-        networks:
-            edgex-network: {aliases: [edgex-core-command]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - metadata
-    scheduler:
-        image: 'edgexfoundry/docker-support-scheduler-go-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '48085:48085'
-        container_name: edgex-support-scheduler
-        hostname: edgex-support-scheduler
-        networks:
-            edgex-network: {aliases: [edgex-support-scheduler]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - metadata
-    export-client:
-        image: 'edgexfoundry/docker-export-client-go-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '48071:48071'
-        container_name: edgex-export-client
-        hostname: edgex-export-client
-        networks:
-            edgex-network: {aliases: [edgex-export-client]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - data
-    export-distro:
-        image: 'edgexfoundry/docker-export-distro-go-arm64:1.0.1'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '48070:48070'
-            - '5566:5566'
-        container_name: edgex-export-distro
-        hostname: edgex-export-distro
-        networks:
-            edgex-network: {aliases: [edgex-export-distro]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - export-client
-        environment:
-            - EXPORT_DISTRO_CLIENT_HOST=export-client
-            - EXPORT_DISTRO_DATA_HOST=edgex-core-data
-            - EXPORT_DISTRO_CONSUL_HOST=edgex-config-seed
-            - EXPORT_DISTRO_MQTTS_CERT_FILE=none
-            - EXPORT_DISTRO_MQTTS_KEY_FILE=none
-    mosquitto:
-        image: 'eclipse-mosquitto:1.6.4'
-        labels:
-            - com.edgex.hide=yes
-        hostname: mosquitto
-        container_name: mosquitto
-        ports:
-            - '1883:1883'
-            - '20003:9001'
-        volumes:
-            - 'mosquitto-conf:/mosquitto/config'
-            - 'mosquitto-data:/mosquitto/data'
-            - 'mosquitto-log:/mosquitto/log'
-        networks:
-            edgex-network: {aliases: [mosquitto]}
-    saar-data-management:
-        image: 'codeserver.saartha.net:8045/saartha/saar-data-management'
-        ports:
-            - '20003:20003'
-        container_name: saar-data-management
-        hostname: saar-data-management
-        networks:
-            edgex-network: {aliases: [saar-data-management]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-    saar-data-export:
-        image: 'codeserver.saartha.net:8045/saartha/saar-data-export'
-        labels:
-            - com.edgex.hide=yes
-        ports:
-            - '20001:20001'
-            - '20002:20002'
-        container_name: saartha-data-import-export
-        hostname: saartha-data-import-export
-        networks:
-            edgex-network: {aliases: [saartha-data-import-export]}
-        volumes:
-            - 'db-data:/data/db'
-            - 'log-data:/edgex/logs'
-            - 'consul-config:/consul/config'
-            - 'consul-data:/consul/data'
-        depends_on:
-            - data
-            - export-distro
+  volume:
+    image: edgexfoundry/docker-edgex-volume-arm64:1.0.0
+    labels: 
+      - "com.edgex.hide=yes"
+    container_name: edgex-files
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-files
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+  consul:
+    image: consul:1.4.5
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600"
+    container_name: edgex-core-consul
+    hostname: edgex-core-consul
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-core-consul
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - volume
+  config-seed:
+    image: codeserver.saartha.net:8045/edgexfoundry/config-seed-go
+    labels:
+      - "com.edgex.hide=yes"
+    container_name: edgex-config-seed
+    hostname: edgex-core-config-seed
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-core-config-seed
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - volume
+      - consul
+  mongo:
+    image: edgexfoundry/docker-edgex-mongo-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "27017:27017"
+    container_name: edgex-mongo
+    hostname: edgex-mongo
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-mongo
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - volume
+  logging:
+    image: edgexfoundry/docker-support-logging-go-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "48061:48061"
+    container_name: edgex-support-logging
+    hostname: edgex-support-logging
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-support-logging
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - config-seed
+      - mongo
+      - volume
+  metadata:
+    image: edgexfoundry/docker-core-metadata-go-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "48081:48081"
+    container_name: edgex-core-metadata
+    hostname: edgex-core-metadata
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-core-metadata
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - logging
+  data:
+    image: edgexfoundry/docker-core-data-go-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "48080:48080"
+      - "5563:5563"
+    container_name: edgex-core-data
+    hostname: edgex-core-data
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-core-data
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - logging
+  command:
+    image: edgexfoundry/docker-core-command-go-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "48082:48082"
+    container_name: edgex-core-command
+    hostname: edgex-core-command
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-core-command
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - metadata
+  scheduler:
+    image: edgexfoundry/docker-support-scheduler-go-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "48085:48085"
+    container_name: edgex-support-scheduler
+    hostname: edgex-support-scheduler
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-support-scheduler
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - metadata
+  export-client:
+    image: edgexfoundry/docker-export-client-go-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "48071:48071"
+    container_name: edgex-export-client
+    hostname: edgex-export-client
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-export-client
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - data
+  export-distro:
+    image: edgexfoundry/docker-export-distro-go-arm64:1.0.1
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "48070:48070"
+      - "5566:5566"
+    container_name: edgex-export-distro
+    hostname: edgex-export-distro
+    networks:
+      edgex-network:
+        aliases:
+          - edgex-export-distro
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - export-client
+    environment:
+      - EXPORT_DISTRO_CLIENT_HOST=export-client
+      - EXPORT_DISTRO_DATA_HOST=edgex-core-data
+      - EXPORT_DISTRO_CONSUL_HOST=edgex-config-seed
+      - EXPORT_DISTRO_MQTTS_CERT_FILE=none
+      - EXPORT_DISTRO_MQTTS_KEY_FILE=none
+  mosquitto:
+    image: eclipse-mosquitto:1.6.4
+    labels:
+      - "com.edgex.hide=yes"
+    hostname: mosquitto
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+      - "20003:9001"
+    volumes:
+      - mosquitto-conf:/mosquitto/config
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+    networks:
+      edgex-network:
+        aliases:
             - mosquitto
-        environment:
-            - SAAR-DATA-EXPORT_MQTTS_CERT_FILE=none
-            - SAAR-DATA-EXPORT_MQTTS_KEY_FILE=none
+  saar-data-management:
+    image: codeserver.saartha.net:8045/saartha/saar-data-management
+    ports:
+      - "20003:20003"
+    container_name: saar-data-management
+    hostname: saar-data-management
+    networks:
+      edgex-network:
+        aliases:
+            - saar-data-management
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+  saar-data-export:
+    image: codeserver.saartha.net:8045/saartha/saar-data-export
+    labels:
+      - "com.edgex.hide=yes"
+    ports:
+      - "20001:20001"
+      - "20002:20002"
+    container_name: saartha-data-import-export
+    hostname: saartha-data-import-export
+    networks:
+      edgex-network:
+        aliases:
+            - saartha-data-import-export
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
+    depends_on:
+      - data
+      - export-distro
+      - mosquitto
+    environment:
+      - SAAR-DATA-EXPORT_MQTTS_CERT_FILE=none
+      - SAAR-DATA-EXPORT_MQTTS_KEY_FILE=none
 networks:
-    edgex-network:
-        external:
-            name: portainer_agent_network
+  edgex-network:
+    external: {name: portainer_agent_network}
