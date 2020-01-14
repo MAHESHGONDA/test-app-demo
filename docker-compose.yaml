@@ -30,8 +30,6 @@ volumes:
 services:
   volume:
     image: edgexfoundry/docker-edgex-volume-arm64:1.0.0
-    labels: 
-      - "com.edgex.hide=yes"
     container_name: edgex-files
     networks:
       edgex-network:
@@ -45,8 +43,6 @@ services:
 
   consul:
     image: consul:1.4.5
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "8400:8400"
       - "8500:8500"
@@ -67,8 +63,6 @@ services:
 
   config-seed:
     image: edgexfoundry/docker-core-config-seed-go-arm64:1.0.0
-    labels: 
-      - "com.edgex.hide=yes"
     container_name: edgex-config-seed
     hostname: edgex-core-config-seed
     networks:
@@ -86,8 +80,6 @@ services:
 
   mongo:
     image: edgexfoundry/docker-edgex-mongo-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "27017:27017"
     container_name: edgex-mongo
@@ -106,8 +98,6 @@ services:
 
   logging:
     image: edgexfoundry/docker-support-logging-go-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "48061:48061"
     container_name: edgex-support-logging
@@ -128,8 +118,6 @@ services:
 
   metadata:
     image: edgexfoundry/docker-core-metadata-go-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "48081:48081"
     container_name: edgex-core-metadata
@@ -148,8 +136,6 @@ services:
 
   data:
     image: edgexfoundry/docker-core-data-go-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "48080:48080"
       - "5563:5563"
@@ -169,8 +155,6 @@ services:
 
   command:
     image: edgexfoundry/docker-core-command-go-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "48082:48082"
     container_name: edgex-core-command
@@ -189,8 +173,6 @@ services:
 
   scheduler:
     image: edgexfoundry/docker-support-scheduler-go-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "48085:48085"
     container_name: edgex-support-scheduler
@@ -209,8 +191,6 @@ services:
 
   export-client:
     image: edgexfoundry/docker-export-client-go-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "48071:48071"
     container_name: edgex-export-client
@@ -229,8 +209,6 @@ services:
 
   export-distro:
     image: edgexfoundry/docker-export-distro-go-arm64:1.0.1
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "48070:48070"
       - "5566:5566"
@@ -260,13 +238,11 @@ services:
 
   mosquitto:
     image: eclipse-mosquitto:1.6.4
-    labels: 
-      - "com.edgex.hide=yes"
     hostname: mosquitto
     container_name: mosquitto
     ports:
       - "1883:1883"
-      - "20003:9001"
+      - "20010:9001"
     volumes:
       - mosquitto-conf:/mosquitto/config
       - mosquitto-data:/mosquitto/data
@@ -278,8 +254,6 @@ services:
 
   saar-data-export:
     image: codeserver.saartha.net:8045/saartha/saar-data-export
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "20001:20001"
       - "20002:20002"
@@ -307,8 +281,6 @@ services:
 
   portainer:
     image: portainer/portainer
-    labels: 
-      - "com.edgex.hide=yes"
     ports:
       - "9000:9000"
     command: -H unix:///var/run/docker.sock
@@ -317,7 +289,22 @@ services:
       - portainer_data:/data
     depends_on:
       - volume
-
+  
+  saar-data-management:
+    image: codeserver.saartha.net:8045/saartha/saar-data-management
+    ports:
+      - "20003:20003"
+    container_name: saar-data-management
+    hostname: saar-data-management
+    networks:
+      edgex-network:
+        aliases:
+            - saar-data-management
+    volumes:
+      - db-data:/data/db
+      - log-data:/edgex/logs
+      - consul-config:/consul/config
+      - consul-data:/consul/data
 networks:
   edgex-network:
     external: {name: portainer_agent_network}
